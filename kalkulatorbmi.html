@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Kalkulator BMI</title>
+</head>
+<style>
+    input[type=text] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid rgb(184, 160, 180);
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        background-color: #e78fd1;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #885c7d;
+    }
+
+    div {
+        width: 100%;
+        border-radius: 5px;
+        padding: 20px;
+        display: block;
+    }
+
+    .container {
+        padding: 20px 0px;
+        display: flex;
+        background-color: #fdd6fb;
+    }
+
+    .modul {
+        padding: 20px;
+        margin: 10px;
+        border: 1px solid rgb(163, 62, 141);
+    }
+
+    .bmi {
+        font-size: 25px;
+    }
+
+    .staryWynik:hover {
+        background-color: #c521c5;
+        cursor: pointer;
+    }
+
+    .staryWynik {
+        padding: 0;
+    }
+
+    h3 {
+        text-align: center;
+        font-size: 40px;
+    }
+</style>
+
+
+<body>
+    <h3>Kalkulator BMI</h3>
+
+    <div class="container">
+
+        <div class="modul">
+            <label for="waga">Waga</label>
+            <input type="text" id="waga" placeholder="Twoja waga (kg)">
+
+            <label for="wzrost">Wzrost</label>
+            <input type="text" id="wzrost" placeholder="Twój wzrost (cm)">
+
+            <button onclick="zatwierdz()">
+                zatwierdź
+            </button>
+        </div>
+
+        <div class="modul">
+            <div class="bmi">Twoje bmi: <span class="bmi" id="bmiwynik"></span></div>
+            <div>Twoja Waga: <span id="wagawynik"></span></div>
+            <div>Twój wzrost: <span id="wzrostwynik"></span></div>
+            <div><span id="roznica"></span></div>
+        </div>
+
+        <div class="modul historia">
+            <div>Twoje srednie bmi: <span id="srednia"></span></div>
+        </div>
+    </div>
+
+
+
+    <script>
+        let wyniki = [];
+
+        function zatwierdz() {
+            let wagaEl = document.querySelector("#waga");
+            let wzrostEl = document.querySelector("#wzrost");
+            let roznicaEl = document.querySelector("#roznica");
+
+            let waga = wagaEl.value;
+            let wzrost = wzrostEl.value;
+
+            if (isNaN(waga) || waga < 40 || waga > 200) {
+                roznicaEl.innerHTML = "Waga nie jest poprawna!";
+                return;
+            }
+
+            if (isNaN(wzrost) || wzrost < 120 || wzrost > 240) {
+                roznicaEl.innerHTML = "Wzrost nie jest poprawny!"
+                return;
+            }
+
+            let bmi = policzBmi(wzrost, waga);
+            roznicaEl.innerHTML = "";
+            if (wyniki.length > 0)
+                poronwajWynik(bmi);
+            wyswietlWynik(wzrost, waga, bmi);
+            zapiszWynik(wzrost, waga, bmi);
+            policzSrednia();
+            wzrostEl.value = "";
+            wagaEl.value = "";
+
+        }
+
+        function zapiszWynik(wzrost, waga, bmi) {
+            let wynik = {
+                wzrost: wzrost,
+                waga: waga,
+                bmi: bmi,
+                data: new Date().toLocaleString()
+            }
+            wyniki.push(wynik);
+
+            let kontenerElement = document.querySelector(".historia");
+            let nowyDiv = document.createElement("div");
+            nowyDiv.innerHTML = "Pomiar z " + wynik.data;
+            nowyDiv.classList.add("staryWynik");
+            kontenerElement.appendChild(nowyDiv);
+
+            nowyDiv.addEventListener("click", function () {
+                let roznicaEl = document.querySelector("#roznica");
+                roznicaEl.innerHTML = "";
+                wyswietlWynik(wzrost, waga, bmi);
+            });
+        }
+
+        function policzBmi(wzrost, waga) {
+            let wzrostwm = wzrost / 100;
+            let wartoscBMI = waga / (wzrostwm * wzrostwm);
+            let bmi = Math.round(wartoscBMI * 100) / 100;
+            return bmi;
+        }
+
+        function poronwajWynik(bmi) {
+            let roznicaEl = document.querySelector("#roznica");
+            let ostatniWynik = wyniki[wyniki.length - 1];
+            if (bmi > ostatniWynik.bmi) {
+                roznicaEl.innerHTML = "Twoje BMI wzrosło!";
+            } else if (bmi < ostatniWynik.bmi) {
+                roznicaEl.innerHTML = "Twoje BMI spadło!";
+            }
+        }
+
+        function policzSrednia() {
+            let sredniaEl = document.querySelector("#srednia");
+            let suma = 0;
+
+            for (let i = 0; i < wyniki.length; i++) {
+                suma = suma + wyniki[i].bmi;
+            }
+
+            let srednia = Math.round((suma / wyniki.length) * 100) / 100;
+            sredniaEl.innerHTML = srednia;
+
+        }
+
+        function wyswietlWynik(wzrost, waga, bmi) {
+            let bmiWynikEl = document.querySelector("#bmiwynik");
+            let wagaWynikEl = document.querySelector("#wagawynik");
+            let wzrostWynikEl = document.querySelector("#wzrostwynik");
+
+            bmiWynikEl.innerHTML = bmi;
+            wagaWynikEl.innerHTML = waga + "kg";
+            wzrostWynikEl.innerHTML = wzrost + "cm";
+        }
+
+    </script>
+</body>
+
+</html>
